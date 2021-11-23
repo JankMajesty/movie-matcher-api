@@ -20,9 +20,9 @@ const getUserById = (req, res) => {
 }
 
 const createUser = (req, res) => {
-  const { firstName, lastName } = req.body
-  let sql = "INSERT INTO users (first_name, last_name) VALUES (?, ?)"
-  sql = mysql.format(sql, [ firstName, lastName ])
+  const { username, password } = req.body
+  let sql = "INSERT INTO users (username, password) VALUES (?, ?)"
+  sql = mysql.format(sql, [ username, password ])
 
   pool.query(sql, (err, results) => {
     if (err) return handleSQLError(res, err)
