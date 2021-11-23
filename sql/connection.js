@@ -7,10 +7,10 @@ class Connection {
 
       const config = {
         connectionLimit: 100,
-        host: 'movie-matcher.c9gwbpwa0mbv.us-east-2.rds.amazonaws.com',
-        user: 'admin',
-        password: '123password',
-        database: 'moviematcher'
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_DEFAULT_SCHEMA    
       }
 
       if (process.env.NODE_ENV === 'production' && process.env.CLOUD_INSTANCE) {
