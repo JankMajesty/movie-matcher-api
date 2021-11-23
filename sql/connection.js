@@ -9,7 +9,7 @@ class Connection {
         connectionLimit: 100,
         host: 'movie-matcher.c9gwbpwa0mbv.us-east-2.rds.amazonaws.com',
         user: 'admin',
-        password: 'Tmbiwsani4606',
+        password: '123password',
         database: 'moviematcher'
       }
 
