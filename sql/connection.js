@@ -13,7 +13,8 @@ class Connection {
         password: process.env.DB_PASSWORD,
         database: process.env.DB_DEFAULT_SCHEMA    
       }
-
+      console.log(process.env.DB_HOST)
+      
   
 
       this.pool = mysql.createPool(config)
