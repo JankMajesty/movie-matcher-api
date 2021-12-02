@@ -1,24 +1,35 @@
-const jwt = require('jsonwebtoken')
+const pool = require('../sql/connection')
+const jwt = require('jsonwebtoken');
+const jwtSecret = "secret5";
 
-const logger = (req, res, next) => {
-  console.log(`${req.path} ${new Date().toISOString()}`)
-  next()
-}
 
-const authenticate = (req, res, next) => {
-  const header = req.headers['authorization'] || ''
-  const [ bearer, token ] = header.split(' ')
+const checkJwt = (req, res, next) => {
+  console.log("processing JWT authentication check");
 
-  try {
-    const decoded = jwt.verify(token, 'secret')
-    req.user = decoded
-    next()
-  } catch(err) {
-    res.sendStatus(401)
+  let token;
+  if(req.headers.authorization){
+    let bearer = req.headers.authorization.split(" ");
+    token = bearer[1]
+  } else{
+    token = null;
   }
+  if(!token){
+    res.status(401).send("Unauthorized!!!");
+  }
+
+  jwt.verify(token, jwtSecret, (err, decoded) => {
+    if(err){
+      console.log("Did not verify jwt" + err);
+      return res.status(401).send("Unauthorized!")
+    }
+
+    console.log(decoded);
+    //req - had info about the post that you were to create
+    //by decoding the token we know who made the request
+    req.userName = decoded.userName;
+    req.id = decoded.id
+    next()
+  })
 }
 
-module.exports = {
-  logger,
-  authenticate
-}
+module.exports = { checkJwt }
