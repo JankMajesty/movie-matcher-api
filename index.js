@@ -5,10 +5,12 @@ const bodyParser = require('body-parser')
 const usersRouter = require('./routers/users');
 const authRouter = require('./routers/auth');
 
-const { logger } = require('./middleware')
+const { logger } = require('./middleware');
+const { config } = require('dotenv');
 
 const app = express()
 const port = process.env.PORT || 3001
+
 
 app.use(bodyParser.json())
 app.use(express.json())
@@ -37,4 +39,5 @@ app.get('/', (req, res) => {
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
+  console.log(process.env)
 })
