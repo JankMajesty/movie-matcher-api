@@ -1,6 +1,7 @@
 require('dotenv').config()
 
 const express = require('express')
+const cors = require('cors')
 const bodyParser = require('body-parser')
 const usersRouter = require('./routers/users');
 const authRouter = require('./routers/auth');
@@ -15,6 +16,7 @@ const port = process.env.PORT || 3001
 app.use(bodyParser.json())
 app.use(express.json())
 
+app.use(cors())
 app.use(logger)
 app.use('/users', usersRouter)
 app.use('/auth', authRouter)

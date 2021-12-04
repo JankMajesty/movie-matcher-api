@@ -2,6 +2,10 @@ const mysql = require('mysql')
 const pool = require('../sql/connection')
 const { handleSQLError } = require('../sql/error')
 
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken');
+const jwtSecret = "secret5";
+
 const getAllUsers = (req, res) => {
   pool.query("SELECT * FROM users", (err, rows) => {
     if (err) return handleSQLError(res, err)
@@ -30,31 +34,54 @@ const createUser = (req, res) => {
   })
 }
 
-const updateUserById = (req, res) => {
-  const { firstName, lastName } = req.body
-  let sql = "UPDATE users SET first_name = ?, last_name = ? WHERE id = ?"
-  sql = mysql.format(sql, [ firstName, lastName, req.params.id ])
-
+const loginUser = (req, res) => {
+  const { username, password } = req.body
+  let sql = "SELECT id, username, password FROM Users WHERE username = ?;"
+  sql = mysql.format(sql, [ username ])
+  
   pool.query(sql, (err, results) => {
-    if (err) return handleSQLError(res, err)
-    return res.status(204).json();
-  })
-}
+    let goodPassword
+    if (err) { 
+      return handleSQLError(res, err)
+    }
+    
+    if(results.length > 1){
+      console.error("Error, too many results with the same username" + username)
+    };
+    if(results.length == 0)(
+      console.error("Did not find a row with the username " + username)
+    )
+    if(!err && results.length == 1){
+      console.log('row password results before password hash compare: ' + results[0].password)
+      
+      let hash = results[0].password
+      
+      goodPassword = bcrypt.compareSync(password, hash)
+      console.log(`this is the result of the 'good password': ` + goodPassword)
+    }
+    
+    if(goodPassword){
+      // set the jwt id equal to the user_id that has been found in the database
+      const id = results[0].id
+      const first_name = results[0].first_name
+      const unsignedToken = {
+        username: username,
+        id: id
+      }
+      const accessToken = jwt.sign(unsignedToken, jwtSecret) //string
+      res.cookie('our_token', accessToken, {httpOnly: true, sameSite: false})
+      return res.json( { accessToken, username, id} );
+    } else {
+      res.status(401).send("username and/or Password are incorrect")
+    }
 
-const deleteUserByFirstName = (req, res) => {
-  let sql = "DELETE FROM users WHERE first_name = ?"
-  sql = mysql.format(sql, [ req.params.first_name ])
-
-  pool.query(sql, (err, results) => {
-    if (err) return handleSQLError(res, err)
-    return res.json({ message: `Deleted ${results.affectedRows} user(s)` });
   })
+
 }
 
 module.exports = {
   getAllUsers,
   getUserById,
   createUser,
-  updateUserById,
-  deleteUserByFirstName
+  loginUser
 }
