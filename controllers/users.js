@@ -36,7 +36,7 @@ const createUser = (req, res) => {
 
 const loginUser = (req, res) => {
   const { username, password } = req.body
-  let sql = "SELECT id, username, password FROM Users WHERE username = ?;"
+  let sql = "SELECT id, username, password FROM users WHERE username = ?;"
   sql = mysql.format(sql, [ username ])
   
   pool.query(sql, (err, results) => {
@@ -45,9 +45,9 @@ const loginUser = (req, res) => {
       return handleSQLError(res, err)
     }
     
-    if(results.length > 1){
-      console.error("Error, too many results with the same username" + username)
-    };
+    // if(results.length > 1){
+    //   console.error("Error, too many results with the same username" + username)
+    // };
     if(results.length == 0)(
       console.error("Did not find a row with the username " + username)
     )
@@ -56,7 +56,10 @@ const loginUser = (req, res) => {
       
       let hash = results[0].password
       
-      goodPassword = bcrypt.compareSync(password, hash)
+      // goodPassword = bcrypt.compareSync(password, hash)
+      goodPassword = password == results[0].password ? true : false;
+      console.log(password)
+      console.log(results[0].password)
       console.log(`this is the result of the 'good password': ` + goodPassword)
     }
     
@@ -74,7 +77,6 @@ const loginUser = (req, res) => {
     } else {
       res.status(401).send("username and/or Password are incorrect")
     }
-
   })
 
 }

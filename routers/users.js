@@ -9,6 +9,8 @@ router.get('/:id', usersController.getUserById)
 
 router.post('/', usersController.createUser)
 
+router.post('/login', usersController.loginUser)
+
 // router.put('/:id', usersController.updateUserById)
 
 
